@@ -1,3 +1,28 @@
+*[Follow the upstream](https://github.com/0polar/ZeroNet/compare/master...HelloZeroNet:master)*
+
+## 1. Create project
+- click Create Project, input Name: (any), click Create
+
+## 2. Deploy Docker image
+- click Deploy Image, choose Image Name, input `0polar/zeroshift`, click 🔍(search), click Deploy
+
+## 3. Use persistent storage
+*This is optional. But if not, when pod restart, all data will lost and sites are need re-download.*
+- go to YOUR_PROJECT_NAME - Applications - Deployments - zeroshift - Configuration
+- remove "Volumes - zeroshift-1"
+- click Add Storage, click Create Storage, input Name: (any), click Create
+- input Mount Path: `/root/data`, click Add
+
+## 4. Expose to clearnet
+- go to YOUR_PROJECT_NAME - Applications - Routes
+- click Create Route, input Name: (any), choose Target Port: `43110 → 43110 (TCP)`, check Secure route, click Create
+- visit URL (if "Application is not available", wait some time and refresh page)
+
+---
+
+Or you can try [ZeroNet on Heroku](https://github.com/BruceJawn/HeroNet)
+
+<!--
 # ZeroNet [![Build Status](https://travis-ci.org/HelloZeroNet/ZeroNet.svg?branch=master)](https://travis-ci.org/HelloZeroNet/ZeroNet) [![Documentation](https://img.shields.io/badge/docs-faq-brightgreen.svg)](https://zeronet.readthedocs.org/en/latest/faq/) [![Help](https://img.shields.io/badge/keep_this_project_alive-donate-yellow.svg)](https://zeronet.readthedocs.org/en/latest/help_zeronet/donate/)
 
 [简体中文](./README-zh-cn.md)
@@ -217,3 +242,4 @@ Site:13DNDk..bhC2 Successfuly published to 3 peers
 * More info, help, changelog, zeronet sites: https://www.reddit.com/r/zeronet/
 * Come, chat with us: [#zeronet @ FreeNode](https://kiwiirc.com/client/irc.freenode.net/zeronet) or on [gitter](https://gitter.im/HelloZeroNet/ZeroNet)
 * Email: hello@zeronet.io (PGP: CB9613AE)
+-->
