@@ -36,7 +36,7 @@ a { color: black }
 	text-align: center; color: white; font-family: Consolas, Monaco, monospace; font-size: 25px;
 }
 .fixbutton-bg {
-	-webkit-border-radius: 80px; -moz-border-radius: 80px; -o-border-radius: 80px; -ms-border-radius: 80px; border-radius: 80px ; background-color: rgba(180, 180, 180, 0.5); cursor: pointer;
+	-webkit-border-radius: 80px; -moz-border-radius: 80px; -o-border-radius: 80px; -ms-border-radius: 80px; border-radius: 80px ; background-color: rgba(255, 0, 0, 0.6); cursor: pointer;
 	display: block; width: 80px; height: 80px; -webkit-transition: background-color 0.2s, box-shadow 0.5s; -moz-transition: background-color 0.2s, box-shadow 0.5s; -o-transition: background-color 0.2s, box-shadow 0.5s; -ms-transition: background-color 0.2s, box-shadow 0.5s; transition: background-color 0.2s, box-shadow 0.5s ; -webkit-transform: scale(0.6); -moz-transform: scale(0.6); -o-transform: scale(0.6); -ms-transform: scale(0.6); transform: scale(0.6) ; margin-left: -20px; margin-top: -20px; /* 2x size to prevent blur on anim */
 	/*box-shadow: inset 105px 260px 0 -200px rgba(0,0,0,0.1);*/ /* -webkit-box-shadow: inset -75px 183px 0 -200px rgba(0,0,0,0.1); -moz-box-shadow: inset -75px 183px 0 -200px rgba(0,0,0,0.1); -o-box-shadow: inset -75px 183px 0 -200px rgba(0,0,0,0.1); -ms-box-shadow: inset -75px 183px 0 -200px rgba(0,0,0,0.1); box-shadow: inset -75px 183px 0 -200px rgba(0,0,0,0.1) ; */
 }
