@@ -20,9 +20,10 @@ def atomicWrite(dest, content, mode="w"):
             os.fsync(f.fileno())
         if os.path.isfile(dest + "-tmpold"):  # Previous incomplete write
             os.rename(dest + "-tmpold", dest + "-tmpold-%s" % time.time())
-        os.rename(dest, dest + "-tmpold")
+        if os.path.isfile(dest):  # Rename old file to -tmpold
+            os.rename(dest, dest + "-tmpold")
         os.rename(dest + "-tmpnew", dest)
-        os.unlink(dest + "-tmpold")
+        os.unlink(dest + "-tmpold")  # Remove old file
         return True
     except Exception, err:
         from Debug import Debug
@@ -217,6 +218,21 @@ def avg(items):
         return sum(items) / len(items)
     else:
         return 0
+
+def isIp(ip):
+    if ":" in ip:  # IPv6
+        try:
+            socket.inet_pton(socket.AF_INET6, ip)
+            return True
+        except:
+            return False
+
+    else:  # IPv4
+        try:
+            socket.inet_aton(ip)
+            return True
+        except:
+            return False
 
 local_ip_pattern = re.compile(r"^(127\.)|(192\.168\.)|(10\.)|(172\.1[6-9]\.)|(172\.2[0-9]\.)|(172\.3[0-1]\.)|(::1$)|([fF][cCdD])")
 def isPrivateIp(ip):

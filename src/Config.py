@@ -13,12 +13,12 @@ class Config(object):
 
     def __init__(self, argv):
         self.version = "0.6.4"
-        self.rev = 3737
+        self.rev = 3750
         self.argv = argv
         self.action = None
         self.pending_changes = {}
         self.need_restart = False
-        self.keys_api_change_allowed = set(["tor", "fileserver_port", "language", "tor_use_bridges", "trackers_proxy", "trackers", "trackers_file", "open_browser"])
+        self.keys_api_change_allowed = set(["tor", "fileserver_port", "language", "tor_use_bridges", "trackers_proxy", "trackers", "trackers_file", "open_browser", "log_level"])
         self.keys_restart_need = set(["tor", "fileserver_port"])
         self.start_dir = self.getStartDir()
 
@@ -354,9 +354,6 @@ class Config(object):
         self.parseCommandline(argv, silent)  # Parse argv
         self.setAttributes()
 
-        self.data_dir = self.data_dir.replace("\\", "/")
-        self.log_dir = self.log_dir.replace("\\", "/")
-
         if not silent:
             if self.fileserver_ip != "*" and self.fileserver_ip not in self.ip_local:
                 self.ip_local.append(self.fileserver_ip)
@@ -398,19 +395,22 @@ class Config(object):
             config.read(self.config_file)
             for section in config.sections():
                 for key, val in config.items(section):
+                    if val == "True":
+                        val = None
                     if section != "global":  # If not global prefix key with section
                         key = section + "_" + key
 
-                    to_end = key == "open_browser"  # Prefer config value over argument
+                    if key == "open_browser":  # Prefer config file value over cli argument
+                        if "--%s" % key in argv:
+                            pos = argv.index("--open_browser")
+                            del argv[pos:pos + 2]
+
                     argv_extend = ["--%s" % key]
                     if val:
                         for line in val.strip().split("\n"):  # Allow multi-line values
                             argv_extend.append(line)
 
-                    if to_end:
-                        argv = argv[:-2] + argv_extend + argv[-2:]
-                    else:
-                        argv = argv[:1] + argv_extend + argv[1:]
+                    argv = argv[:1] + argv_extend + argv[1:]
         return argv
 
     # Expose arguments as class attributes
@@ -421,6 +421,8 @@ class Config(object):
             for key, val in args.items():
                 if type(val) is list:
                     val = val[:]
+                if key in ("data_dir", "log_dir"):
+                    val = val.replace("\\", "/")
                 setattr(self, key, val)
 
     def loadPlugins(self):

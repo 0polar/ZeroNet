@@ -48,8 +48,22 @@ class UiRequest(object):
         self.user = None
         self.script_nonce = None  # Nonce for script tags in wrapper html
 
+    def learnHost(self, host):
+        self.server.allowed_hosts.add(host)
+        self.server.log.info("Added %s as allowed host" % host)
+
     def isHostAllowed(self, host):
         if host in self.server.allowed_hosts:
+            return True
+
+        # Allow any IP address as they are not affected by DNS rebinding
+        # attacks
+        if helper.isIp(host):
+            self.learnHost(host)
+            return True
+
+        if ":" in host and helper.isIp(host.rsplit(":", 1)[0]):  # Test without port
+            self.learnHost(host)
             return True
 
         if self.isProxyRequest():  # Support for chrome extension proxy
@@ -61,8 +75,7 @@ class UiRequest(object):
         if self.server.learn_allowed_host:
             # Learn the first request's host as allowed one
             self.server.learn_allowed_host = False
-            self.server.allowed_hosts.add(host)
-            self.server.log.info("Added %s as allowed host" % host)
+            self.learnHost(host)
             return True
 
         return False
@@ -234,8 +247,8 @@ class UiRequest(object):
 
         if noscript:
             headers["Content-Security-Policy"] = "default-src 'none'; sandbox allow-top-navigation allow-forms; img-src 'self'; font-src 'self'; media-src 'self'; style-src 'self' 'unsafe-inline';"
-        elif script_nonce:
-            headers["Content-Security-Policy"] = "script-src 'nonce-%s'" % script_nonce
+        elif script_nonce and "Edge/" not in self.env.get("HTTP_USER_AGENT"):
+            headers["Content-Security-Policy"] = "default-src 'none'; script-src 'nonce-{0}'; img-src 'self'; style-src 'self' 'unsafe-inline'; connect-src *; frame-src 'self'".format(script_nonce)
 
         if allow_ajax:
             headers["Access-Control-Allow-Origin"] = "null"

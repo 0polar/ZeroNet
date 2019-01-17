@@ -5,6 +5,7 @@ import os
 import shutil
 import re
 import copy
+import logging
 
 import gevent
 
@@ -669,8 +670,6 @@ class UiWebsocket(object):
             s = time.time()
         rows = []
         try:
-            if not query.strip().upper().startswith("SELECT"):
-                raise Exception("Only SELECT query supported")
             res = self.site.storage.query(query, params)
         except Exception, err:  # Response the error to client
             self.log.error("DbQuery error: %s" % err)
@@ -850,7 +849,7 @@ class UiWebsocket(object):
         self.site.updateWebsocket(cert_changed=domain)
         self.response(to, "ok")
 
-    # List user1s certificates
+    # List user's certificates
     def actionCertList(self, to):
         back = []
         auth_address = self.user.getAuthAddress(self.site.address)
@@ -1080,5 +1079,8 @@ class UiWebsocket(object):
 
         if key == "trackers_file":
             config.loadTrackersFile()
+
+        if key == "log_level":
+            logging.getLogger('').setLevel(logging.getLevelName(config.log_level))
 
         self.response(to, "ok")
