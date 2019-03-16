@@ -72,12 +72,6 @@ class UiRequest(object):
             else:
                 return False
 
-        if self.server.learn_allowed_host:
-            # Learn the first request's host as allowed one
-            self.server.learn_allowed_host = False
-            self.learnHost(host)
-            return True
-
         return False
 
     # Call the request handler function base on path
@@ -235,6 +229,16 @@ class UiRequest(object):
         else:
             return referer
 
+    def isScriptNonceSupported(self):
+        user_agent = self.env.get("HTTP_USER_AGENT")
+        if "Edge/" in user_agent:
+            is_script_nonce_supported = False
+        elif "Safari/" in user_agent and "Chrome/" not in user_agent:
+            is_script_nonce_supported = False
+        else:
+            is_script_nonce_supported = True
+        return is_script_nonce_supported
+
     # Send response headers
     def sendHeader(self, status=200, content_type="text/html", noscript=False, allow_ajax=False, script_nonce=None, extra_headers=[]):
         headers = {}
@@ -247,7 +251,7 @@ class UiRequest(object):
 
         if noscript:
             headers["Content-Security-Policy"] = "default-src 'none'; sandbox allow-top-navigation allow-forms; img-src 'self'; font-src 'self'; media-src 'self'; style-src 'self' 'unsafe-inline';"
-        elif script_nonce and "Edge/" not in self.env.get("HTTP_USER_AGENT"):
+        elif script_nonce and self.isScriptNonceSupported():
             headers["Content-Security-Policy"] = "default-src 'none'; script-src 'nonce-{0}'; img-src 'self'; style-src 'self' 'unsafe-inline'; connect-src *; frame-src 'self'".format(script_nonce)
 
         if allow_ajax:
@@ -378,7 +382,7 @@ class UiRequest(object):
             for peer in match.group(1).split(","):
                 if not re.match(".*?:[0-9]+$", peer):
                     continue
-                ip, port = peer.split(":")
+                ip, port = peer.rsplit(":", 1)
                 if site.addPeer(ip, int(port), source="query_string"):
                     num_added += 1
             site.log.debug("%s peers added by query string" % num_added)

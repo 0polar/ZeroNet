@@ -26,7 +26,10 @@ class ConfigStorage extends Class
 
 	deformatValue: (value, type) ->
 		if type == "object" and typeof(value) == "string"
-			return value.split("\n")
+			if not value.length
+				return value = null
+			else
+				return value.split("\n")
 		if type == "boolean" and not value
 			return false
 		else
@@ -45,11 +48,29 @@ class ConfigStorage extends Class
 		section = @createSection("Network")
 
 		section.items.push
+			key: "fileserver_ip_type"
+			title: "File server network"
+			type: "select"
+			options: [
+				{title: "IPv4", value: "ipv4"}
+				{title: "IPv6", value: "ipv6"}
+				{title: "Dual (IPv4 & IPv6)", value: "dual"}
+			]
+			description: "Accept incoming peers using IPv4 or IPv6 address. (default: dual)"
+
+		section.items.push
 			key: "fileserver_port"
 			title: "File server port"
 			type: "text"
 			valid_pattern: /[0-9]*/
 			description: "Other peers will use this port to reach your served sites. (default: 15441)"
+
+		section.items.push
+			key: "ip_external"
+			title: "File server external ip"
+			type: "textarea"
+			placeholder: "Detect automatically"
+			description: "Your file server is accessible on these ips. (default: detect automatically)"
 
 		section.items.push
 			title: "Tor"
